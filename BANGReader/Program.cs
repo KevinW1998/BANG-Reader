@@ -12,7 +12,7 @@ namespace BANGReader
 
             Console.WriteLine(Directory.GetCurrentDirectory());
 
-            BangFiles.ReadFromFile("Athens_13_Mileto_Land.age4scn");
+            BangFiles.ReadFromFile("Tiny_FFA_v2.5.age3Yscn");
         }
     }
 }

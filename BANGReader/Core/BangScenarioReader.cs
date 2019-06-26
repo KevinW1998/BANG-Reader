@@ -34,7 +34,7 @@ namespace BANGReader.Core
 
             if (header.FileVersion >= 33)
             {
-                header.UnkBool = chunkReader.ReadBoolean();
+                header.IsMultiplayerSave = chunkReader.ReadBoolean();
             }
 
             return header;
@@ -564,7 +564,7 @@ namespace BANGReader.Core
                 dataToWrite.ShouldInitWorld = chunkReader.ReadBoolean();
             }
 
-            if(fileVersion >= 34 && dataToWrite.Header.UnkBool)
+            if(fileVersion >= 34 && dataToWrite.Header.IsMultiplayerSave)
             {
                 chunkReader.ReadExpectedTag(0x504D);
                 // TODO: Skip rest

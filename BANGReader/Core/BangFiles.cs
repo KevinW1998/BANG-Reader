@@ -1,5 +1,6 @@
 ﻿using BANGReader.Core.Data;
 using ComponentAce.Compression.Libs.zlib;
+using Ionic.Zlib;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -89,9 +90,12 @@ namespace BANGReader.Core
 
                 uint archiveSize = sr.ReadUInt32();
 
-                using (ZInputStream stream = new ZInputStream(sr.BaseStream))
+                using (ZlibStream stream = new ZlibStream(sr.BaseStream, CompressionMode.Decompress, CompressionLevel.Default, true))
+                using (BinaryReader binaryStreamReader = new BinaryReader(stream))
                 {
-                    ProcessStream(stream);
+                    stream.BufferSize = 32000;
+
+                    ProcessStream(new BinaryReader(stream));
                 }
             }
 

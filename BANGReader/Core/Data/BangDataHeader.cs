@@ -14,7 +14,7 @@ namespace BANGReader.Core.Data
         public string UnkCArray { get; set; } = "";
         public string UnkStr { get; set; } = "";
 
-        public bool UnkBool { get; set; } = false;
+        public bool IsMultiplayerSave { get; set; } = false;
 
     }
 }
