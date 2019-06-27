@@ -42,6 +42,10 @@ namespace BANGReader.Core.Data
 
         public List<BangHomeCityDeck> Decks { get; set; } = new List<BangHomeCityDeck>();
 
+        public List<BangHomeCityPreservedCard> PreservedCards { get; set; } = new List<BangHomeCityPreservedCard>();
+
+        public List<string> TechNames { get; set; } = new List<string>();
+
         public static BangHomeCity Load(BangChunkReader<BangDataHeader> chunkReader)
         {
             BangHomeCity bangHomeCity = new BangHomeCity();
@@ -82,6 +86,27 @@ namespace BANGReader.Core.Data
             {
                 bangHomeCity.Decks.Add(BangHomeCityDeck.Load(chunkReader));
             }
+
+            int numOfPreservedCards = chunkReader.ReadInt32();
+            for(int i = 0; i < numOfPreservedCards; i++)
+            {
+                bangHomeCity.PreservedCards.Add(BangHomeCityPreservedCard.Load(chunkReader));
+            }
+
+            int numOfTechs = chunkReader.ReadInt32();
+            for(int i = 0; i < numOfTechs; i++)
+            {
+                bangHomeCity.TechNames.Add(chunkReader.ReadString());
+            }
+
+            bangHomeCity.PreservedCards.Clear(); // ???
+            numOfPreservedCards = chunkReader.ReadInt32();
+            for (int i = 0; i < numOfPreservedCards; i++)
+            {
+                bangHomeCity.PreservedCards.Add(BangHomeCityPreservedCard.Load(chunkReader));
+            }
+
+
 
 
             return bangHomeCity;

@@ -20,6 +20,7 @@ namespace BANGReader.Core.Data
 
         public List<BangHomeCityCard> Cards { get; set; } = new List<BangHomeCityCard>();
 
+        public List<BangHomeCityPreservedCard> PreservedCards { get; set; } = new List<BangHomeCityPreservedCard>();
 
         public static BangHomeCityDeck Load(BangChunkReader<BangDataHeader> chunkReader)
         {
@@ -57,7 +58,11 @@ namespace BANGReader.Core.Data
 
             if(bangHomeCityDeck.Version > 3)
             {
-
+                int numOfPreservedCards = chunkReader.ReadInt32();
+                for(int i = 0; i < numOfPreservedCards; i++)
+                {
+                    bangHomeCityDeck.PreservedCards.Add(BangHomeCityPreservedCard.Load(chunkReader));
+                }
             }
 
 
