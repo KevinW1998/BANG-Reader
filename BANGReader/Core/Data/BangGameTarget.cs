@@ -4,11 +4,11 @@ using System.Text;
 
 namespace BANGReader.Core.Data
 {
-    public enum BangGameType
+    public enum BangGameTarget
     {
         TryDetect,
-        Scenario,
-        Save,
-        Recorded
+        AgeOfMythology,
+        AgeOfEmpires3,
+        AgeOfEmpiresOnline
     }
 }

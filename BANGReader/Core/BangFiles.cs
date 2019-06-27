@@ -43,47 +43,92 @@ namespace BANGReader.Core
             return Encoding.ASCII.GetString(strData);
         }
 
-        private static void ProcessStream(BinaryReader reader)
+        private static void ProcessStream(BinaryReader reader, BangGameTarget target, BangGameType type)
         {
-            BangScenarioReader scReader = new BangScenarioReader(new BangChunkReader(reader));
-            BangData data = scReader.ReadAll();
+            BangScenarioReader scReader = new BangScenarioReader(new BangChunkReader<BangDataHeader>(reader));
+            BangData data = scReader.ReadAll(target, type);
 
-            /*
-            var entry = ReadExpectedTag(reader, 0x4742);
-            var fileVersion = reader.ReadUInt32();
-            string creatorVersionInformation = fileVersion >= 25 ? ReadString(reader) : "Unknown";
-
-            var lenUnkArray = fileVersion >= 4 ? reader.ReadInt32() : 0;
-            string unkVal = ReadASCIIString(reader, lenUnkArray);
-
-            if(fileVersion >= 23)
-            {
-                int unkVal2 = reader.ReadInt32();
-                string unkStr2 = ReadString(reader);
-            }
-
-            long pos = reader.BaseStream.Position;
-
-            if(fileVersion >= 33)
-            {
-                bool unkBool = reader.ReadBoolean();
-            }
-            */
         }
 
-        public static void ReadFromFile(string path)
+        public static void ReadFromFile(string path, BangGameTarget target = BangGameTarget.TryDetect, BangGameType type = BangGameType.TryDetect)
         {
             if (!File.Exists(path))
                 throw new FileNotFoundException($"File not found {path}");
 
-            // Check magic
-            using(var sr = new BinaryReader(File.Open(path, FileMode.Open)))
+            if(target == BangGameTarget.TryDetect)
+            {
+                string pathExt = Path.GetExtension(path).ToLower();
+                switch(pathExt)
+                {
+                    case ".sav":
+                    case ".scn":
+                    case ".rec":
+                    case ".scx":
+                    case ".rcx":
+                        target = BangGameTarget.AgeOfMythology;
+                        break;
+                    case ".age3ysav":
+                    case ".age3yscn":
+                    case ".age3yrec":
+                    case ".age3xsav":
+                    case ".age3xscn":
+                    case ".age3xrec":
+                    case ".age3sav":
+                    case ".age3scn":
+                    case ".age3rec":
+                        target = BangGameTarget.AgeOfEmpires3;
+                        break;
+                    case ".age4sav":
+                    case ".age4scn":
+                    case ".age4rec":
+                        target = BangGameTarget.AgeOfEmpiresOnline;
+                        break;
+                    default:
+                        throw new InvalidOperationException("Failed to detect game target");
+                }
+            }
+
+            if (type == BangGameType.TryDetect)
+            {
+                string pathExt = Path.GetExtension(path).ToLower();
+                switch (pathExt)
+                {
+                    case ".sav":
+                    case ".age3ysav":
+                    case ".age3xsav":
+                    case ".age3sav":
+                    case ".age4sav":
+                        type = BangGameType.Save;
+                        break;
+                    case ".scn":
+                    case ".scx":
+                    case ".age3yscn":
+                    case ".age3xscn":
+                    case ".age3scn":
+                    case ".age4scn":
+                        type = BangGameType.Scenario;
+                        break;
+                    case ".rec":
+                    case ".rcx":
+                    case ".age3yrec":
+                    case ".age3xrec":
+                    case ".age3rec":
+                    case ".age4rec":
+                        type = BangGameType.Recorded;
+                        break;
+                    default:
+                        throw new InvalidOperationException("Failed to detect game type");
+                }
+            }
+
+                // Check magic
+                using (var sr = new BinaryReader(File.Open(path, FileMode.Open)))
             {
                 byte[] magic = sr.ReadBytes(4);
                 if (!magic.SequenceEqual(CompressMagic))
                 {
                     sr.BaseStream.Position = 0;
-                    ProcessStream(sr);
+                    ProcessStream(sr, target, type);
                     return;
                 }
                     
@@ -95,7 +140,7 @@ namespace BANGReader.Core
                 {
                     stream.BufferSize = 32000;
 
-                    ProcessStream(new BinaryReader(stream));
+                    ProcessStream(new BinaryReader(stream), target, type);
                 }
             }
 

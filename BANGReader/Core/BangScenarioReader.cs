@@ -7,37 +7,12 @@ namespace BANGReader.Core
 {
     class BangScenarioReader
     {
-        private BangChunkReader chunkReader;
+        private BangChunkReader<BangDataHeader> chunkReader;
 
 
-        public BangScenarioReader(BangChunkReader chunkReader)
+        public BangScenarioReader(BangChunkReader<BangDataHeader> chunkReader)
         {
             this.chunkReader = chunkReader;
-        }
-
-        public BangDataHeader ReadHeader()
-        {
-            BangDataHeader header = new BangDataHeader();
-
-            chunkReader.ReadExpectedTag(0x4742);
-            header.FileVersion = chunkReader.ReadInt32();
-            header.VersionInformation = header.FileVersion >= 25 ? chunkReader.ReadString() : "Unknown";
-
-            var lenUnkArray = header.FileVersion >= 4 ? chunkReader.ReadInt32() : 0;
-            header.UnkCArray = chunkReader.ReadASCIIString(lenUnkArray);
-
-            if (header.FileVersion >= 23)
-            {
-                int unkLangId = chunkReader.ReadInt32(); // TODO: This is lang id --> would need to load lang xml files
-                header.UnkStr = chunkReader.ReadString();
-            }
-
-            if (header.FileVersion >= 33)
-            {
-                header.IsMultiplayerSave = chunkReader.ReadBoolean();
-            }
-
-            return header;
         }
 
         public BangWorld ReadWorld(bool unkA5)
@@ -540,7 +515,7 @@ namespace BANGReader.Core
 
 
             // Unknown params - START
-            bool unkA5 = true;
+            bool isScenario = dataToWrite.Header.GameType == BangGameType.Scenario;
             bool unkA7 = false;
             // Unknown params - END
 
@@ -552,7 +527,7 @@ namespace BANGReader.Core
             {
                 // maybe game generation 0 = AoM, 1 = AGE III, 2 = AOEO?
                 // or it could be DLC --> AGE III, AGE III War Chiefs, AGE III Asians
-                dataToWrite.GameType = chunkReader.ReadEnum<BangGameType>();
+                dataToWrite.GameType = chunkReader.ReadEnum<BangGameRequirements>();
             }
 
             if (fileVersion > BangDataHeader.MaxFileVersion)
@@ -568,6 +543,8 @@ namespace BANGReader.Core
             {
                 chunkReader.ReadExpectedTag(0x504D);
                 // TODO: Skip rest
+                // TODO: Read MP Settings data
+
                 return;
             } else if(fileVersion < 34) {
                 // TODO: Read old data?
@@ -580,7 +557,7 @@ namespace BANGReader.Core
             {
                 if(fileVersion >= 34)
                 {
-                    if (unkA5)
+                    if (isScenario)
                     {
                         dataToWrite.NumPlayers = chunkReader.ReadInt32();
 
@@ -596,15 +573,14 @@ namespace BANGReader.Core
 
                 // Home City Related
                 bool unkBGameByte2744 = false;
-                if(fileVersion < 43 || unkA5 != true)
+                if(fileVersion < 43 || isScenario != true)
                 {
                     unkBGameByte2744 = true;
+                    
                 } else {
                     // Home city related
-                    chunkReader.ReadExpectedTag(0x4853);
+                    dataToWrite.HomeCityManager = BangHomeCityManager.Load(chunkReader);
 
-                    int unkVal = chunkReader.ReadInt32();
-                    int unkVal2 = chunkReader.ReadInt32();
                 }
 
                 // Campaign Related
@@ -687,14 +663,14 @@ namespace BANGReader.Core
                 // Selection manager - END
 
                 // Proto - START
-                if(!unkA5)
+                if(!isScenario)
                 {
                     throw new NotImplementedException("Embedded proto data is not implemented");
                 }
                 // Proto - END
 
                 // TechTree - START
-                if(!unkA5)
+                if(!isScenario)
                 {
                     throw new NotImplementedException("Embedded tech tree data is not implemented");
                 }
@@ -705,7 +681,7 @@ namespace BANGReader.Core
                 {
                     chunkReader.ReadExpectedTag(0x4D51);
                     var questManagerUnkVal = chunkReader.ReadInt32();
-                    if(unkA5 && questManagerUnkVal >= 2)
+                    if(isScenario && questManagerUnkVal >= 2)
                     {
                         var numElems = chunkReader.ReadInt32();
 
@@ -832,7 +808,7 @@ namespace BANGReader.Core
                 // Trigger Manager - END
 
                 // World - START
-                dataToWrite.World = ReadWorld(unkA5);
+                dataToWrite.World = ReadWorld(isScenario);
                 // World - END
             }
 
@@ -841,11 +817,11 @@ namespace BANGReader.Core
 
         }
 
-        public BangData ReadAll()
+        public BangData ReadAll(BangGameTarget target, BangGameType type)
         {
             BangData data = new BangData();
 
-            data.Header = ReadHeader();
+            data.Header = BangDataHeader.Load(chunkReader, target, type);
 
             ReadBody(data);
 

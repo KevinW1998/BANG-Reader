@@ -5,10 +5,12 @@ using System.Text;
 
 namespace BANGReader.Core.Data
 {
-    public class BangChunkReader
+    public class BangChunkReader<THeader>
     {
         private BinaryReader reader;
         private List<BangChunkEntry> entries = new List<BangChunkEntry>();
+
+        public THeader Header { get; set; } = default(THeader);
 
         public BangChunkReader(BinaryReader reader)
         {

@@ -10,7 +10,7 @@ namespace BANGReader.Core.Data
         float G;
         float B;
 
-        public static BangColor Read(BangChunkReader reader)
+        public static BangColor Read<T>(BangChunkReader<T> reader)
         {
             BangColor ret;
             ret.R = reader.ReadFloat();

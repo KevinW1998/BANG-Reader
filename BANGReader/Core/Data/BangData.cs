@@ -9,7 +9,7 @@ namespace BANGReader.Core.Data
         public BangDataHeader Header { get; set; } = null;
 
         // General
-        public BangGameType GameType { get; set; } = BangGameType.AgeOfMythology;
+        public BangGameRequirements GameType { get; set; } = BangGameRequirements.RequiresBaseGame;
         public BangModeType SavedModeType { get; set; } = BangModeType.Invalid;
         public bool ShouldInitWorld { get; set; } = true;
 
@@ -20,6 +20,9 @@ namespace BANGReader.Core.Data
         public BangColor FadeColor { get; set; }
         public int FadeDuration { get; set; } = 0;
         public int FadeDelay { get; set; } = 0;
+
+        // HomeCityManager
+        public BangHomeCityManager HomeCityManager { get; set; } = null;
 
         // Campaign Settings
         public int CampaignIndex { get; set; } = -1;
