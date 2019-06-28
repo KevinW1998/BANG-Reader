@@ -97,7 +97,7 @@ namespace BANGReader.Core.Data
         public int FormationCommandVersion { get; set; } = 0;
         public int PlayerChatCommandVersion { get; set; } = 0;
         public int UnknownNoRef40Version { get; set; } = 0;
-        public int UnknownNoRef41Version { get; set; } = 0;
+        public int DamageVersion { get; set; } = 0;
         public int PlayerDataCommandVersion { get; set; } = 0;
         public int UnknownNoRef42Version { get; set; } = 0;
         public int EjectCommandVersion { get; set; } = 0;

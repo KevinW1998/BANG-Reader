@@ -6,6 +6,7 @@ namespace BANGReader.Core.Data
 {
     public class BangHomeCityManager
     {
+        public uint Version { get; set; } = 0;
 
         public int UnkDword4 { get; set; } = 0;
 
@@ -17,7 +18,7 @@ namespace BANGReader.Core.Data
 
             chunkReader.ReadExpectedTag(0x4853);
 
-            uint unkVal = chunkReader.ReadUInt32();
+            bangHomeCityManager.Version = chunkReader.ReadUInt32();
             bangHomeCityManager.UnkDword4 = chunkReader.ReadInt32();
             
             // Only in Age3

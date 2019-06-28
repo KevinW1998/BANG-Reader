@@ -12,11 +12,11 @@ namespace BANGReader.Core.Data
 
         public string Name { get; set; } = "My Deck";
 
-        public int UnkC { get; set; } = 1;
+        public int GameID { get; set; } = 1; // Related to BangGameRequirements?
 
-        public bool UnkByte34 { get; set; } = false;
+        public bool IsDefault { get; set; } = false;
 
-        public List<int> UnkArray10 { get; set; } = new List<int>();
+        public List<int> TechIDs { get; set; } = new List<int>();
 
         public List<BangHomeCityCard> Cards { get; set; } = new List<BangHomeCityCard>();
 
@@ -33,18 +33,18 @@ namespace BANGReader.Core.Data
             bangHomeCityDeck.Name = chunkReader.ReadString();
             if(bangHomeCityDeck.Version > 2)
             {
-                bangHomeCityDeck.UnkC = chunkReader.ReadInt32();
+                bangHomeCityDeck.GameID = chunkReader.ReadInt32();
             }
 
             if(bangHomeCityDeck.Version > 0)
             {
-                bangHomeCityDeck.UnkByte34 = chunkReader.ReadBoolean();
+                bangHomeCityDeck.IsDefault = chunkReader.ReadBoolean();
             }
 
             int numOfUnkArray10 = chunkReader.ReadInt32();
             for(int i = 0; i < numOfUnkArray10; i++)
             {
-                bangHomeCityDeck.UnkArray10.Add(chunkReader.ReadInt32());
+                bangHomeCityDeck.TechIDs.Add(chunkReader.ReadInt32());
             }
 
             if(bangHomeCityDeck.Version > 1)

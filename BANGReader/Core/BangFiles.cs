@@ -23,7 +23,7 @@ namespace BANGReader.Core
             return new BangChunkEntry()
             {
                 Tag = readTag,
-                Data = readData
+                DataLen = readData
             };
         }
 

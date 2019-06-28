@@ -27,16 +27,18 @@ namespace BANGReader.Core.Data
             entries.Add(new BangChunkEntry()
             {
                 Tag = readTag,
-                Data = readData
+                DataLen = readData
             });
         }
 
         public void ReadExpectedTagAndSkip(ushort expectedTag)
         {
             ReadExpectedTag(expectedTag);
-            var bytesToSkip = entries[entries.Count - 1].Data;
+            var bytesToSkip = entries[entries.Count - 1].DataLen;
 
-            reader.BaseStream.Seek(bytesToSkip, SeekOrigin.Current);
+            reader.ReadBytes((int)bytesToSkip);
+
+            // reader.BaseStream.Seek(bytesToSkip, SeekOrigin.Current);
         }
 
         public int ReadExpectedTagValue(ushort expectedTag)

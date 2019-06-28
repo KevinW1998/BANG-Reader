@@ -89,7 +89,10 @@ namespace BANGReader.Core
             world.DeleteUnitCommandVersion = chunkReader.ReadExpectedTagValue(0x4d4d);
             world.AddResourceCommandVersion = chunkReader.ReadExpectedTagValue(0x514d);
             world.StopCommandVersion = chunkReader.ReadExpectedTagValue(0x534d);
-            world.UnknownNoRef31Version = chunkReader.ReadExpectedTagValue(0x534d); // sub_1626B0
+
+            if (chunkReader.Header.GameTarget == BangGameTarget.AgeOfEmpiresOnline)
+                world.UnknownNoRef31Version = chunkReader.ReadExpectedTagValue(0x534d); // sub_1626B0
+
             world.CinematicCommandVersion = chunkReader.ReadExpectedTagValue(0x314e);
             world.SpecialPowerCommandVersion = chunkReader.ReadExpectedTagValue(0x5650);
             world.MarketCommandVersion = chunkReader.ReadExpectedTagValue(0x564d);
@@ -135,7 +138,7 @@ namespace BANGReader.Core
             world.FormationCommandVersion = chunkReader.ReadExpectedTagValue(0x5655);
             world.PlayerChatCommandVersion = chunkReader.ReadExpectedTagValue(0x5641);
             world.UnknownNoRef40Version = chunkReader.ReadExpectedTagValue(0x4347);
-            world.UnknownNoRef41Version = chunkReader.ReadExpectedTagValue(0x3024);
+            world.DamageVersion = chunkReader.ReadExpectedTagValue(0x3024);
 
             if (world.Version < 224)
             {
@@ -679,31 +682,34 @@ namespace BANGReader.Core
                 // Quest Manager - START
                 if(fileVersion >= 44)
                 {
-                    chunkReader.ReadExpectedTag(0x4D51);
-                    var questManagerUnkVal = chunkReader.ReadInt32();
-                    if(isScenario && questManagerUnkVal >= 2)
+                    if(dataToWrite.Header.GameTarget == BangGameTarget.AgeOfEmpiresOnline)
                     {
-                        var numElems = chunkReader.ReadInt32();
-
-                        for(int i = 0; i < numElems; i++)
+                        chunkReader.ReadExpectedTag(0x4D51);
+                        var questManagerUnkVal = chunkReader.ReadInt32();
+                        if (isScenario && questManagerUnkVal >= 2)
                         {
-                            BangQuestArea newArea = new BangQuestArea();
-                            newArea.Name = chunkReader.ReadString();
+                            var numElems = chunkReader.ReadInt32();
 
-                            chunkReader.ReadExpectedTag(0x5451);
-                            int unkQuestSubVal = chunkReader.ReadInt32();
-
-                            int unkQuestSubCount = chunkReader.ReadInt32();
-                            for(int j = 0; j < unkQuestSubCount; j++)
+                            for (int i = 0; i < numElems; i++)
                             {
-                                BangPoint newPoint;
-                                newPoint.X = chunkReader.ReadInt32();
-                                newPoint.Y = chunkReader.ReadInt32();
+                                BangQuestArea newArea = new BangQuestArea();
+                                newArea.Name = chunkReader.ReadString();
 
-                                newArea.Points.Add(newPoint);
+                                chunkReader.ReadExpectedTag(0x5451);
+                                int unkQuestSubVal = chunkReader.ReadInt32();
+
+                                int unkQuestSubCount = chunkReader.ReadInt32();
+                                for (int j = 0; j < unkQuestSubCount; j++)
+                                {
+                                    BangPoint newPoint;
+                                    newPoint.X = chunkReader.ReadInt32();
+                                    newPoint.Y = chunkReader.ReadInt32();
+
+                                    newArea.Points.Add(newPoint);
+                                }
+
+                                dataToWrite.QuestAreas.Add(newArea);
                             }
-
-                            dataToWrite.QuestAreas.Add(newArea);
                         }
                     }
                 }
